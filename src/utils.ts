@@ -1,4 +1,5 @@
 import { Messages, Position, Satellite, Satellites } from "./types";
+var nerdamer = require('nerdamer/all.min'); 
 
 export const getMessage = (messages: Messages[]): string => {
     let arrMessageFinal: string[] = [];
@@ -26,6 +27,17 @@ export const getLocation = (distances: number[]): Position => {
         x: 500,
         y: 100
     };*/
+    const sol = nerdamer.solveEquations('(100)^2 = (x+200)^2 + (y+500)^2','x');
+    console.log('x = ' +sol[0].toString());
+
+    const sol2 = nerdamer.solveEquations('(115.5)^2 = (x-100)^2 + (y+100)^2','y');
+    console.log('y = ' +sol2[0].toString());
+
+    let tmp = '(115.5)^2 = (x-100)^2 + (y+100)^2'.replace('x',sol[0].toString())
+    const sol3 = nerdamer.solveEquations(tmp,'y');
+    
+    if(sol3[0].imaginary || sol3[0].isInfinity || sol3[0].value.includes('i')) console.log('NNNNNNNNNNNNNNNNNNNNNNNNNNNNOOOOOOOOOOOOOOOOOOO')
+    console.log(nerdamer(sol3[0].toString()).evaluate().text());
 
     console.log(distances);
     let resultCoordenadas : Position = {
