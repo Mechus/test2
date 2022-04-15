@@ -1,5 +1,7 @@
+//Tipo para conjunto de mensajes de satelites
 export type Messages = string[];
 
+//Interface para response de calculos
 export interface PositionMessage {
     position: {
         x: number,
@@ -8,6 +10,7 @@ export interface PositionMessage {
     message: string
 };
 
+//Interface para request de satelites
 export interface Satellites {
     name: string,
     distance: number,
