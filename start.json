@@ -1,0 +1,15 @@
+{
+    "apps": [
+        {
+            "name": "test-api",
+            "script": "npm run tsc && build/index.js",
+            "instances": 2,
+            "exec_mode": "cluster",
+            "env_production": {
+                "NODE_ENV": "production",
+                "NODE_OPTION": "--max_old_space_size:8192"
+            },
+            "args": "--max_old_space_size:8192"
+        }
+    ]
+}
