@@ -5,6 +5,7 @@ import satelittesData from './satellites.json';
 
 const satellitesDinamic: Satellites[] = satelittesData as Satellites[];
 
+//Metodo para obtener coordenadas y mensaje de los satelites y construccion de respuesta
 export const getTopSecret = (satellites: Satellites[]): PositionMessage | undefined => {
     try {
         const position: Position | undefined = getLocation(satellites.map(x => x.distance));
@@ -19,10 +20,12 @@ export const getTopSecret = (satellites: Satellites[]): PositionMessage | undefi
     
         return resultPositionMessage;
     } catch (error) {
+        console.log(error)
         return undefined;
     }
 };
 
+//Metodo para guardar informacion de satelites en objeto en memoria
 export const postTopSecretSplit = (satellite: SatellitesSecret, name: Satellite): boolean => {
     try {
         let actualSatellite = satellitesDinamic.find(x => x.name === name);
@@ -40,14 +43,15 @@ export const postTopSecretSplit = (satellite: SatellitesSecret, name: Satellite)
         
         return true;
     } catch (error) {
+        console.log(error)
         return false;
     }
 };
 
+//Metodo para obtener coordenadas y mensaje de los objeto de satelites en memoria y construccion de respuesta
 export const getTopSecretSplit = (): PositionMessage | undefined => {
     try {
         if(satellitesDinamic.length < 2) return undefined;
-        console.log(satellitesDinamic)
     
         const position: Position | undefined = getLocation(satellitesDinamic.map(x => x.distance));
         const message: string = getMessage(satellitesDinamic.map(x => x.message));
@@ -61,6 +65,7 @@ export const getTopSecretSplit = (): PositionMessage | undefined => {
     
         return resultPositionMessage;
     } catch (error) {
+        console.log(error)
         return undefined;
     }
 };
