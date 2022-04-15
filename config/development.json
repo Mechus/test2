@@ -1,0 +1,31 @@
+{
+    "paths": {
+        "topSecretPath": "/topsecret",
+        "topSecretSplitGPath": "/topsecret_split",
+        "topSecretSplitPPath": "/topsecret_split/:name"
+    },
+    "satellites": {
+        "kenobi": 
+            {
+                "x": "-500",
+                "y": "-200"
+            },
+        "skywalker": 
+            {
+                "x": "100",
+                "y": "-100"
+            },
+        "sato": 
+            {
+                "x": "500",
+                "y": "100"
+            }
+    },
+    "log": {
+        "level": "DEBUG",
+        "levels": {
+            "error": "./log/error.log",
+            "debug": "./log/debug.log"
+        }
+    }
+}

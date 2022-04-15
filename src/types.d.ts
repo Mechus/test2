@@ -14,11 +14,5 @@ export interface Satellites {
     message: Messages
 };
 
-export enum Satellite {
-    kenobi = 'kenobi',
-    skywalker = 'skywalker',
-    sato = 'sato'
-}
-
 export type SatellitesSecret = Omit<Satellites, 'name'>;
 export type Position = Omit<PositionMessage, 'message'>;

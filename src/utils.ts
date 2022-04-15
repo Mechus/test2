@@ -1,66 +1,90 @@
-import { Messages, Position, Satellite, Satellites } from "./types";
+import { Messages, Position, Satellites } from "./types";
+import { Satellite } from "./enum";
+import config from 'config';
 var nerdamer = require('nerdamer/all.min'); 
 
 export const getMessage = (messages: Messages[]): string => {
-    let arrMessageFinal: string[] = [];
-    let majorLength: number = messages.reduce((a,b) => (a < b.length) ? b.length : a,0)
-
-    for(let i = 0; i < majorLength; i++){
-        for (const message of messages) {
-            arrMessageFinal[i] = (message[i] && message[i].length > 0) ? message[i] : arrMessageFinal[i];
+    try {
+        let arrMessageFinal: string[] = [];
+        let majorLength: number = messages.reduce((a,b) => (a < b.length) ? b.length : a,0)
+    
+        for(let i = 0; i < majorLength; i++){
+            for (const message of messages) {
+                arrMessageFinal[i] = (message[i] && message[i].length > 0) ? message[i] : arrMessageFinal[i];
+            }
         }
+    
+        return arrMessageFinal.join(' ');
+    } catch (error) {
+        return "";
     }
-
-    return arrMessageFinal.join(' ');
 };
 
-export const getLocation = (distances: number[]): Position => {
-    /*const kenobi: Coordenadas ={
-        x: -500,
-        y: -200
-    };
-    const skywalker: Coordenadas ={
-        x: 100,
-        y: 100
-    };
-    const sato: Coordenadas ={
-        x: 500,
-        y: 100
-    };*/
-    const sol = nerdamer.solveEquations('(100)^2 = (x+200)^2 + (y+500)^2','x');
-    console.log('x = ' +sol[0].toString());
+export const getLocation = (distances: number[]): Position | undefined => {
+    try {
+        const equationKenobi = '('+distances[0]+')^2 = (x-('+config.get<string>('satellites.kenobi.x')+'))^2 + (y-('+config.get<string>('satellites.kenobi.y')+'))^2';
+        const equationSkywalker = '('+distances[1]+')^2 = (x-('+config.get<string>('satellites.skywalker.x')+'))^2 + (y-('+config.get<string>('satellites.skywalker.y')+'))^2';
+        const equationSato= '('+distances[2]+')^2 = (x-('+config.get<string>('satellites.sato.x')+'))^2 + (y-('+config.get<string>('satellites.sato.y')+'))^2';
 
-    const sol2 = nerdamer.solveEquations('(115.5)^2 = (x-100)^2 + (y+100)^2','y');
-    console.log('y = ' +sol2[0].toString());
-
-    let tmp = '(115.5)^2 = (x-100)^2 + (y+100)^2'.replace('x',sol[0].toString())
-    const sol3 = nerdamer.solveEquations(tmp,'y');
+        let solXKenobi = nerdamer.solveEquations(equationKenobi,'x');
     
-    if(sol3[0].imaginary || sol3[0].isInfinity || sol3[0].value.includes('i')) console.log('NNNNNNNNNNNNNNNNNNNNNNNNNNNNOOOOOOOOOOOOOOOOOOO')
-    console.log(nerdamer(sol3[0].toString()).evaluate().text());
+        let solYSkywalker = nerdamer.solveEquations(equationSkywalker,'y');
+    
+        let solYKenobiSkywalker = 'y = ' + solYSkywalker[0].toString().replace(/x/g,'('+solXKenobi[0].toString()+')')
+        const solYFinalKS = nerdamer.solveEquations(solYKenobiSkywalker,'y');
 
-    console.log(distances);
-    let resultCoordenadas : Position = {
-        position: {
-            x: 1,
-            y: 2
+        if(isValidNumber(solYFinalKS[0])){
+            let solXKenobiSkywalker = solXKenobi[0].toString().replace(/y/g,'('+solYFinalKS[0].toString()+')')
+            const solXFinalKS = nerdamer.solveEquations(solXKenobiSkywalker,'x');
+            
+            if(isValidNumber(solXFinalKS[0])){
+                return {
+                    position: {
+                    x: nerdamer(solXFinalKS[0].toString()).evaluate().text(),
+                    y: nerdamer(solYFinalKS[0].toString()).evaluate().text()
+                }};
+            }
         }
-    };
+    
+        let solYSato = nerdamer.solveEquations(equationSato,'y');
+    
+        let solYKenobiSato = solYSkywalker[0].toString().replace(/x/g,'('+solXKenobi[0].toString()+')')
+        const solYFinalKSa = nerdamer.solveEquations(solYKenobiSato,'y');
 
-    return resultCoordenadas;
+        if(isValidNumber(solYFinalKSa[0])){
+            let solXKenobiSato = solYSato[0].toString().replace(/y/g,'('+solYFinalKSa[0].toString()+')')
+            const solXFinalKSa = nerdamer.solveEquations(solXKenobiSato,'x');
+            
+            if(isValidNumber(solXFinalKSa[0])){
+                return {
+                    position: {
+                    x: nerdamer(solXFinalKSa[0].toString()).evaluate().text(),
+                    y: nerdamer(solYFinalKSa[0].toString()).evaluate().text()
+                }};
+            }
+        }
+    
+        return undefined;
+    } catch (error) {
+        return undefined;
+    }
 };
 
 export const validateSatellite = (satellite: Satellites | Satellites[]): boolean => {
-    let tmpArray: Satellites[] = [];
-    if(Array.isArray(satellite)) tmpArray = tmpArray.concat(satellite);
-    else tmpArray.push(satellite);
-
-    for (const objSatellite of tmpArray) {
-        if(objSatellite.name && (!isString(objSatellite.name) || !isSatellite(objSatellite.name))) return false;
-        if(objSatellite.distance && !isNumber(objSatellite.distance)) return false;
-        if(objSatellite.message && !isArrayString(objSatellite.message)) return false;
+    try {
+        let tmpArray: Satellites[] = [];
+        if(Array.isArray(satellite)) tmpArray = tmpArray.concat(satellite);
+        else tmpArray.push(satellite);
+    
+        for (const objSatellite of tmpArray) {
+            if(objSatellite.name && (!isString(objSatellite.name) || !isSatellite(objSatellite.name))) return false;
+            if(objSatellite.distance && !isNumber(objSatellite.distance)) return false;
+            if(objSatellite.message && !isArrayString(objSatellite.message)) return false;
+        }
+        return true;
+    } catch (error) {
+        return false;
     }
-    return true;
 };
 
 
@@ -84,4 +108,8 @@ const isNumber = (string:any):boolean => {
 
 const isArrayString = (string:string[]):boolean => {
     return string.every( x => typeof x === 'string');
+}
+
+const isValidNumber = (equation:any):boolean => {
+    return !(equation.imaginary || equation.isInfinity || equation.value.includes('i'))
 }
